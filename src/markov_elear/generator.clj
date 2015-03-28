@@ -36,7 +36,7 @@
           (recur new-prefix chain (conj result suffix)))))))
 
 (defn generate-text [prefix chain]
-  (let [ prefix (clojure.string/split prefix #" ")
+  (let [prefix (clojure.string/split prefix #" ")
         result-chain (walk-chain prefix chain prefix)
         result-text (chain->text result-chain)]
     result-text))
