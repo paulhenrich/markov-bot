@@ -1,8 +1,5 @@
 (ns markov-elear.generator)
 
-(def example "And the Golden Grouse And the Pobble who")
-(def words (clojure.string/split example #" "))
-
 (defn word-transitions [sample]
   (let [words (clojure.string/split sample #"[\s|\n]")]
     (partition-all 3 1 words)))
