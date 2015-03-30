@@ -40,3 +40,22 @@
         result-chain (walk-chain prefix chain prefix)
         result-text (chain->text result-chain)]
     result-text))
+
+(defn process-file [filename]
+  (-> filename
+      clojure.java.io/resource
+      slurp
+      text->word-chain))
+
+(generate-text "want to" (process-file "lean.txt"))
+(generate-text "it is" (process-file "lean.txt"))
+(generate-text "to be" (process-file "lean.txt"))
+
+(generate-text "if you" (process-file "paul.txt"))
+(generate-text "for the" (process-file "paul.txt"))
+
+(generate-text "How to" (process-file "blog-titles.txt"))
+
+(filter (fn [el] (> (count (second el)) 2)) (process-file "lean.txt"))
+(filter (fn [el] (> (count (second el)) 4)) (process-file "paul.txt"))
+(filter (fn [el] (> (count (second el)) 2)) (process-file "blog-titles.txt"))
