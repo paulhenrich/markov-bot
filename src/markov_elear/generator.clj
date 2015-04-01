@@ -19,8 +19,6 @@
 (defn chain->text [chain]
   (apply str (interpose " " chain)))
 
-(chain->text ["and" "the" "pobble"])
-
 (defn walk-chain [prefix chain result]
   (let [suffixes (get chain prefix)]
     (if (empty? suffixes)
@@ -46,16 +44,26 @@
       clojure.java.io/resource
       slurp
       text->word-chain))
+(def corpus (merge-with {}
+                        (process-file "lean.txt")
+                        (process-file "fifty-shades.txt")))
+(generate-text "The Lean" corpus)
+(generate-text "powerful tool" corpus)
+(generate-text "The challenge" corpus)
+(generate-text "deliver value" corpus)
+(generate-text "Think goals" corpus)
+(generate-text "To validate" corpus)
+(generate-text "Brant Cooper," corpus)
+(generate-text "Powerful new" corpus)
+(generate-text "For example," corpus)
+(generate-text "The learning" corpus)
+(generate-text "No matter" corpus)
+(generate-text "experts may" corpus)
+(generate-text "best practices" corpus)
+(generate-text "for Pinterest," corpus)
+(generate-text "Lean Startup," corpus)
 
-(generate-text "want to" (process-file "lean.txt"))
-(generate-text "it is" (process-file "lean.txt"))
-(generate-text "to be" (process-file "lean.txt"))
 
-(generate-text "if you" (process-file "paul.txt"))
-(generate-text "for the" (process-file "paul.txt"))
+;;(filter (fn [el] (> (count (second el)) 2)) (process-file "lean.txt"))
+;;(filter (fn [el] (> (count (second el)) 2)) (process-file "fifty-shades.txt"))
 
-(generate-text "How to" (process-file "blog-titles.txt"))
-
-(filter (fn [el] (> (count (second el)) 2)) (process-file "lean.txt"))
-(filter (fn [el] (> (count (second el)) 4)) (process-file "paul.txt"))
-(filter (fn [el] (> (count (second el)) 2)) (process-file "blog-titles.txt"))
