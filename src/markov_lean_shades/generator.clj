@@ -61,20 +61,20 @@
 
 (defn rand-prefix []
   (rand-nth (keys (filter
-                   (fn [el] (and
-                             (= 0 (count (clojure.set/intersection lean-words (second el))))
-                             (> (count (second el)) 1)))
-                   lean-corpus))))
+                   (fn [el]
+                     (= 0 (count (clojure.set/intersection lean-words (set (first el))))))
+                     lean-corpus))))
 
 (defn gen-random []
   (generate-text (chain->text (rand-prefix)) corpus))
 
-(dotimes [n 100]
-  (let [phrase (gen-random)]
-    (if (re-find #"\w \w.*(matrix|maker|hacker|startup|entrepreneur|analytics|branding|brand).*" phrase)
-      (println phrase))))
-(gen-random)
-(println (gen-random))
+(defn up-to-n-random-phrases [n]
+  (dotimes [i n]
+    (let [phrase (gen-random)]
+      (if (re-find #"\w \w.*(Lean|matrix|maker|hacker|startup|entrepreneur|analytics|branding|brand).*" phrase)
+        (println phrase)))))
+
+(up-to-n-random-phrases 100)
 
 ;;(filter (fn [el] (> (count (second el)) 2)) (process-file "fifty-shades.txt"))
 
