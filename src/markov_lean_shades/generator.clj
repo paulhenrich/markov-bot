@@ -1,6 +1,8 @@
 (ns markov-lean-shades.generator
   (:require clojure.set))
 
+(def lean-words
+  #{"lean" "Lean" "Startup" "VC" "teams" "cross-functional" "startup" "branding" "entrepreneur" "explain" "experiment" "validate" "experiments"})
 (defn word-transitions [sample]
   (let [words (clojure.string/split sample #"[\s|\n]")]
     (partition-all 3 1 words)))
@@ -46,27 +48,32 @@
       slurp
       text->word-chain))
 
-(def corpus (merge-with {}
-                        (process-file "lean.txt")
-                        (process-file "blog-titles.txt")
-                        (process-file "fifty-shades.txt")))
+(def lean-corpus
+  (merge-with {}
+              (process-file "lean.txt")
+              (process-file "blog-titles.txt")))
 
+(def corpus
+  (merge-with {}
+              lean-corpus
+              (process-file "fifty-shades.txt")))
 
 
 (defn rand-prefix []
   (rand-nth (keys (filter
-                   (fn [el] (> (count (second el)) 1))
-                   ;; corpus
-                   (process-file "blog-titles.txt")
-                   ))))
+                   (fn [el] (and
+                             (= 0 (count (clojure.set/intersection lean-words (second el))))
+                             (> (count (second el)) 1)))
+                   lean-corpus))))
 
 (defn gen-random []
   (generate-text (chain->text (rand-prefix)) corpus))
 
-;; (dotimes [n 10000]
-;;   (let [phrase (gen-random)]
-;;     (if (re-find #"\w \w.*(startup|entrepreneur|analytics|branding|brand).*" phrase)
-;;       (println phrase))))
+(dotimes [n 100]
+  (let [phrase (gen-random)]
+    (if (re-find #"\w \w.*(matrix|maker|hacker|startup|entrepreneur|analytics|branding|brand).*" phrase)
+      (println phrase))))
+(gen-random)
 (println (gen-random))
 
 ;;(filter (fn [el] (> (count (second el)) 2)) (process-file "fifty-shades.txt"))
