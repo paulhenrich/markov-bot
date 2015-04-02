@@ -1,6 +1,6 @@
-(ns markov-elear.generator-test
+(ns markov-lean-shades.generator-test
   (:require [clojure.test :refer :all]
-            [markov-elear.generator :refer :all]))
+            [markov-lean-shades.generator :refer :all]))
 
 
 (deftest test-word-chain
