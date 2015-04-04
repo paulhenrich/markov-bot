@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [markov-lean-shades.generator :refer :all]))
 
+;; some tests are copied directly from the HowIStart article.
 
 (deftest test-word-chain
   (testing "it produces a chain of the possible two step transitions"
@@ -26,7 +27,6 @@
               ["And" "the"] #{"Pobble" "Golden"}}
              (text->word-chain example))))))
 
-;; copy & paste (shrug)
 (deftest test-walk-chain
   (let [chain {["who" nil] #{},
                ["Pobble" "who"] #{},
@@ -53,6 +53,7 @@
                  (take 8 (walk-chain prefix chain prefix)))))))))
 
 (deftest test-generate-text
+  "it strings together and capitalizes the text"
   (with-redefs [shuffle (fn [c] c)]
     (let [chain {["who" nil] #{}
                  ["Pobble" "who"] #{}
@@ -61,5 +62,13 @@
                  ["Golden" "Grouse"] #{"And"}
                  ["the" "Golden"] #{"Grouse"}
                  ["And" "the"] #{"Pobble" "Golden"}}]
-      (is (= "the Pobble who" (generate-text "the Pobble" chain)))
+      (is (= "The Pobble who" (generate-text "the Pobble" chain)))
       (is (= "And the Pobble who" (generate-text "And the" chain))))))
+
+(deftest test-score
+  "scores the tail of the phrase for leanness"
+  (with-redefs [lean-words #{"lean" "startup" "disrupt"}]
+    (is (= 0 (score "Massage my clavicle, he murmered")))
+    (is (= 0 (score "Lean doesn't count at index 0 or 1")))
+    (is (= 1 (score "Then we disrupt everything!")))
+    (is (= 2 (score "He murmured, disrupt every startup.")))))

@@ -2,10 +2,10 @@
   (:require clojure.set))
 
 (def lean-words
-  (let [ words #{"Ries" "Lean" "LSM" "adopting" "practices" "funnel" "growth" "hacking"
-                 "hacker" "VC" "teams" "cross-functional" "strategic" "strategy" "failure"
-                 "startup" "branding" "entrepreneur" "founder" "CTO" "disrupt" "MVP"
-                 "experiment" "experimental" "validate" "experiments"}]
+  (let [words #{"Ries" "Lean" "LSM" "adopting" "practices" "funnel" "growth" "hacking"
+                "hacker" "VC" "teams" "cross-functional" "strategic" "strategy" "failure" "fail"
+                "startup" "branding" "entrepreneur" "founder" "CTO" "disrupt" "MVP" "assumptions"
+                "riskiest" "experiment" "experimental" "validate" "experiments"}]
     (clojure.set/union words (map clojure.string/capitalize words))))
 
 (defn word-transitions [sample]
@@ -63,7 +63,6 @@
               lean-corpus
               (process-file "fifty-shades.txt")))
 
-
 (defn rand-prefix []
   (rand-nth (keys (filter
                    (fn [el]
@@ -73,13 +72,17 @@
 (defn gen-random []
   (generate-text (chain->text (rand-prefix)) corpus))
 
+(defn score [phrase]
+  (count (clojure.set/intersection lean-words
+                                   (-> phrase
+                                       (clojure.string/replace #"[^a-zA-Z\s]" "")
+                                       (clojure.string/split #"\s")
+                                       rest rest set))))
 (defn up-to-n-random-phrases [n]
   (dotimes [i n]
     (let [phrase (gen-random)
-          score (count (clojure.set/intersection lean-words (-> (clojure.string/split phrase #"\s")
-                                                                 rest
-                                                                 rest
-                                                                 set)))]
-      (when (> score 0)
+          ]
+      (when (> (score phrase) 0)
         (println phrase)))))
 (up-to-n-random-phrases 1000)
+
