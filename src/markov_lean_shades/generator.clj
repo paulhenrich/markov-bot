@@ -83,10 +83,6 @@
                        (re-find #"^[a-z0-9]+[^\.,!\(\)]$" (second prefix)))) ; avoid starting with the end
                 lean-corpus)))
 
-(defn gen-random []
-  (let [rand-prefix (-> branching-prefixes rand-nth chain->text)]
-    (generate-text rand-prefix corpus)))
-
 (defn score [phrase targets]
   "Scores phrases by coincidence with words in targets (set)"
   (count (clojure.set/intersection targets
