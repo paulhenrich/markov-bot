@@ -95,14 +95,18 @@
                                        (clojure.string/split #"\s")
                                        set))))
 
+(defn trim-phrase [phrase]
+  (clojure.string/replace phrase #"[.,][^\.,]*$" "."))
+
 (defn gen-random []
   "Generate a random 50 Shades of Lean phrase"
   (let [prefix (-> branching-prefixes rand-nth chain->text)
-        phrase (generate-text prefix corpus)
+        phrase (trim-phrase (generate-text prefix corpus))
         valid? (and (>= (score phrase lean-words) 1)
                     (>= (score phrase shades-words) 1))]
     (if valid?
       phrase
       (recur))))
 
-(println (gen-random))
+(dotimes [i 100]
+  (println (gen-random)))

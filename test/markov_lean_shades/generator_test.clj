@@ -2,7 +2,7 @@
   (:require [clojure.test :refer :all]
             [markov-lean-shades.generator :refer :all]))
 
-;; some tests are copied directly from the HowIStart article.
+;; most tests are copied directly or nearly so from the HowIStart article.
 
 (deftest test-word-chain
   (testing "it produces a chain of the possible two step transitions"
@@ -65,9 +65,15 @@
       (is (= "the Pobble who" (generate-text "the Pobble" chain)))
       (is (= "And the Pobble who" (generate-text "And the" chain))))))
 
+(deftest test-trim-phrase
+  "cuts off run-on phrases at the last punctuation, <- for instance right there"
+  (is (= "We test. Iteratively." (trim-phrase "We test. Iteratively. Then")))
+  (is (= "We test, iteratively." (trim-phrase "We test, iteratively, then")))
+  )
+
 (deftest test-score
   "scores the entire phrase for target words"
   (let [lean-words #{"lean" "startup" "disrupt"}]
-    (is (= 0 (score "Massage my clavicle, he murmered" lean-words)))
+    (is (= 0 (score "Massage my clavicle, he murmured" lean-words)))
     (is (= 1 (score "Then we disrupt everything!" lean-words)))
     (is (= 2 (score "He murmured, disrupt every startup." lean-words)))))
