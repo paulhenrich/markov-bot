@@ -9,7 +9,6 @@
                (env :app-consumer-secret)
                (env :user-access-token)
                (env :user-access-secret)))
-(gen-random)
 
 (defn tweet! []
   (let [tweet (gen-random)]
@@ -18,5 +17,6 @@
                                   :params {:status tweet})
          (catch Exception e (println "Error: " (.getMessage e))))))
 
-(dotimes [i 5]
+(defn -main [& args]
+  ;; tweet once & die (calling w/ heroku scheduler)
   (tweet!))

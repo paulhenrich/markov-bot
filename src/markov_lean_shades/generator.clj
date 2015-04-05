@@ -103,6 +103,3 @@
     (if valid?
       phrase
       (recur))))
-
-(dotimes [i 100]
-  (println (gen-random)))
