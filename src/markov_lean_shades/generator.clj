@@ -76,17 +76,6 @@
 (def corpus
   (merge lean-corpus shades-corpus))
 
-;; ; frequency counting of source texts
-;; (def shades-text
-;;   (-> "inc-lean.txt" clojure.java.io/resource slurp))
-;; (def shades-freq
-;;   (frequencies (clojure.string/split shades-text #"\s")))
-;; (->> shades-freq
-;;      (sort-by val)
-;;      reverse
-;;      (take 250)
-;;      println)
-
 (def branching-prefixes
   "Find potential starting point for the generator"
   (keys (filter (fn [[prefix suffixes]]
@@ -98,20 +87,22 @@
   (let [rand-prefix (-> branching-prefixes rand-nth chain->text)]
     (generate-text rand-prefix corpus)))
 
-(gen-random)
 (defn score [phrase targets]
   "Scores phrases by coincidence with words in targets (set)"
   (count (clojure.set/intersection targets
                                    (-> phrase
-                                       (clojure.string/replace #"[^a-zA-Z\s]" "") ; strip punctuation
-                                       (clojure.string/split #"\s") ; tokenize
-                                       set)))) ;
-(defn up-to-n-random-phrases [n]
-  "A placeholder for a smarter front-end"
-  (dotimes [i n]
-    (let [phrase (gen-random)]
-      (when (and (>= (score phrase lean-words) 1)
-                 (>= (score phrase shades-words) 1))
-        (println phrase)))))
+                                       (clojure.string/replace #"[^a-zA-Z\s]" "") ; ignore punctuation
+                                       (clojure.string/split #"\s")
+                                       set))))
 
-(up-to-n-random-phrases 1000)
+(defn gen-random []
+  "Generate a random 50 Shades of Lean phrase"
+  (let [prefix (-> branching-prefixes rand-nth chain->text)
+        phrase (generate-text prefix corpus)
+        valid? (and (>= (score phrase lean-words) 1)
+                    (>= (score phrase shades-words) 1))]
+    (if valid?
+      phrase
+      (recur))))
+
+(println (gen-random))
