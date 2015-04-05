@@ -3,11 +3,11 @@
 
 (def lean-words
   "Frequent words in lean corpus"
-  (let [words #{"Lean" "LSM" "adopting" "practices" "funnel" "hacking" "pivot" "hypotheses" "traditional"
+  (let [words #{"Lean" "adopting" "practices" "funnel" "hacking" "pivot" "hypotheses" "traditional"
                 "hacker" "hackers" "makers" "VC" "teams" "cross-functional" "strategic" "strategy"
                 "startup" "startups" "start-ups" "start-up" "branding" "founder" "founders" "CTO" "disrupt" "methodology"
                 "MVP" "assumptions" "riskiest" "experimental" "validate" "validation" "experiments"
-                "software" "download" "IMVU"}]
+                "software" "download" "conversion" "audience" "measure"}]
     (clojure.set/union words (map clojure.string/capitalize words))))
 
 (def shades-words
@@ -90,7 +90,8 @@
 (def branching-prefixes
   "Find potential starting point for the generator"
   (keys (filter (fn [[prefix suffixes]]
-                  (re-find #"^[A-Z]" (first prefix)))
+                  (and (re-find #"^[A-Z][a-z]+[^\.,!\(\)]$" (first prefix))
+                       (re-find #"^[a-z0-9]+[^\.,!\(\)]$" (second prefix)))) ; avoid starting with the end
                 lean-corpus)))
 
 (defn gen-random []
