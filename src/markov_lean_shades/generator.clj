@@ -90,8 +90,7 @@
 (def branching-prefixes
   "Find potential starting point for the generator"
   (keys (filter (fn [[prefix suffixes]]
-                  (and (re-find #"[A-Z0-9]" (first prefix)) 
-                       (> (count suffixes) 0)))
+                  (re-find #"^[A-Z]" (first prefix)))
                 lean-corpus)))
 
 (defn gen-random []
