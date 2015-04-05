@@ -62,13 +62,12 @@
                  ["Golden" "Grouse"] #{"And"}
                  ["the" "Golden"] #{"Grouse"}
                  ["And" "the"] #{"Pobble" "Golden"}}]
-      (is (= "The Pobble who" (generate-text "the Pobble" chain)))
+      (is (= "the Pobble who" (generate-text "the Pobble" chain)))
       (is (= "And the Pobble who" (generate-text "And the" chain))))))
 
 (deftest test-score
-  "scores the tail of the phrase for leanness"
-  (with-redefs [lean-words #{"lean" "startup" "disrupt"}]
-    (is (= 0 (score "Massage my clavicle, he murmered")))
-    (is (= 0 (score "Lean doesn't count at index 0 or 1")))
-    (is (= 1 (score "Then we disrupt everything!")))
-    (is (= 2 (score "He murmured, disrupt every startup.")))))
+  "scores the entire phrase for target words"
+  (let [lean-words #{"lean" "startup" "disrupt"}]
+    (is (= 0 (score "Massage my clavicle, he murmered" lean-words)))
+    (is (= 1 (score "Then we disrupt everything!" lean-words)))
+    (is (= 2 (score "He murmured, disrupt every startup." lean-words)))))
