@@ -10,8 +10,11 @@
                (env :user-access-token)
                (env :user-access-secret)))
 
+(defn hashtag [phrase]
+  (clojure.string/replace phrase #"Lean Startup" "#LeanStartup"))
+
 (defn tweet! []
-  (let [tweet (gen-random)]
+  (let [tweet (hashtag (gen-random))]
     (println "Tweeting: " tweet)
     (try (twitter/statuses-update :oauth-creds my-creds
                                   :params {:status tweet})
