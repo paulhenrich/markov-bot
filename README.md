@@ -10,10 +10,13 @@ Place source texts in /resources
 
 `(markov-lean-shades.generator/gen-random)`
 
+## Credit
+
+The good ideas in this come from [Gigasquid's](https://github.com/gigasquid) How I Start article.
+
 ## License
 
 Copyright © 2015 Paul Henrich
-Based on HowIStart/Clojure.
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
