@@ -3,20 +3,39 @@
 
 (def lean-words
   "Frequent words in lean corpus"
-  (let [words #{"Lean" "adopting" "practices" "funnel" "hacking" "pivot" "hypotheses" "traditional"
-                "hacker" "hackers" "makers" "VC" "teams" "cross-functional" "strategic" "strategy"
-                "startup" "startups" "start-ups" "start-up" "branding" "founder" "founders" "CTO" "disrupt" "methodology"
-                "MVP" "assumptions" "riskiest" "experimental" "validate" "validation" "experiments"
-                "software" "download" "conversion" "audience" "measure"}]
+  (let [words #{"CTO" "Lean" "MVP" "VC" "adopting" "assumptions" "audience" "branding" "conversion"
+                "cross-functional" "disrupt" "download" "experimental" "experiments" "founder" "founders"
+                "funnel" "hacker" "hackers" "hacking" "hypotheses" "launch" "launching" "makers" "measure"
+                "method" "methodology" "model" "pivot" "practices" "riskiest" "software" "start-up"
+                "start-ups" "startup" "startups" "strategic" "strategy" "teams" "traditional" "validate"
+                "validation"}]
     (clojure.set/union words (map clojure.string/capitalize words))))
+
 
 (def shades-words
   "Frequent &/ salacious words in Fifty Shades"
-  (let [words #{"Oh" "pulls" "Subject:" "contract" "don't" "Christian" "Ana" "Anastasia" "dominant" "submissive"
-                "gently" "hard" "me" "safe" "sex" "leather" "mouth" "murmurs" "cable" "tie" "biting" "hips"
-                "breathe" "breath" "eyes" "staring" "fingers" "bath" "Perspex" "black" "red" "legs"
-                "behind" "smiles"}]
+  (let [words #{"Ana" "Anastasia" "Christian" "Oh" "Perspex" "back" "bath" "behind" "biting"
+                "black" "breath" "breathe" "cable" "contract" "dominant" "don't" "eyes" "fingers"
+                "gently" "hair" "hard" "hips" "kisses" "leather" "legs" "me" "mouth" "murmurs" "pulls"
+                "red" "safe" "says" "sex" "smiles" "staring" "submissive" "tie"}]
     (clojure.set/union words (map clojure.string/capitalize words))))
+
+;; frequency counting of source texts
+(defn freq-words [filename]
+  "Returns frequent words that aren't the *most* frequent"
+  (let [file-text (-> filename clojure.java.io/resource slurp)
+        freqs (frequencies (clojure.string/split file-text #"\s"))]
+    (->> freqs
+         (sort-by val)
+         reverse
+         (take 200)
+         (drop 50)
+         println)))
+
+;; (freq-words "lean.txt")
+;; (freq-words "inc-lean.txt")
+;; (freq-words "hbs-lean.txt")
+;; (freq-words "fifty-shades.txt")
 
 (defn word-transitions [sample]
   "Transform text into trigrams"
@@ -98,8 +117,10 @@
   "Generate a random 50 Shades of Lean phrase"
   (let [prefix (-> branching-prefixes rand-nth chain->text)
         phrase (trim-phrase (generate-text prefix corpus))
-        valid? (and (>= (score phrase lean-words) 1)
-                    (>= (score phrase shades-words) 1))]
+        valid? (and (>= (score phrase lean-words) 2)
+                    (>= (score phrase shades-words) (inc (rand-int 2))))]
     (if valid?
       phrase
       (recur))))
+
+(gen-random)
