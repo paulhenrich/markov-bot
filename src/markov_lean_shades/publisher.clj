@@ -11,7 +11,9 @@
                (env :user-access-secret)))
 
 (defn hashtag [phrase]
-  (clojure.string/replace phrase #"Lean Startup" "#LeanStartup"))
+  ( -> phrase
+       (clojure.string/replace #"Lean Startup" "#LeanStartup")
+       (clojure.string/replace #"startup" "#startup")))
 
 (defn tweet! []
   (let [tweet (hashtag (gen-random))]
