@@ -12,7 +12,7 @@ Place source texts in /resources
 
 ## Credit
 
-The good ideas in this come from [Gigasquid's](https://github.com/gigasquid) How I Start article.
+The good ideas in this come from [Gigasquid's](https://github.com/gigasquid) [How I Start article](https://howistart.org/posts/clojure/1).
 
 ## License
 
