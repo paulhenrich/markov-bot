@@ -101,9 +101,7 @@
   "All potential starting points for the generator"
   (keys (filter (fn [[prefix suffixes]]
                   (and (not (empty? suffixes))
-                       (re-find #"^[A-Z][a-z]+[^\.,!\(\)]$" (first prefix))  ; avoid starting
-                       ;(re-find #"^[a-z0-9]+[^\.,!\(\)]$" (second prefix))
-                       )) ; with punctuation
+                       (re-find #"^[A-Z][a-z]+[^\.,!\(\)]$" (first prefix)))) ; capitalized words not ending a sentence
                 corpus)))
 
 (defn score [phrase targets]
@@ -128,4 +126,3 @@
     (if valid?
       phrase
       (recur))))
-
