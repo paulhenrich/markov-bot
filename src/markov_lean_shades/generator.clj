@@ -20,32 +20,15 @@
                 "red" "safe" "says" "sex" "smiles" "staring" "submissive" "tie"}]
     (clojure.set/union words (map clojure.string/capitalize words))))
 
-;; frequency counting of source texts
-(defn freq-words [filename]
-  "Returns frequent words that aren't the *most* frequent"
-  (let [file-text (-> filename clojure.java.io/resource slurp)
-        freqs (frequencies (clojure.string/split file-text #"\s"))]
-    (->> freqs
-         (sort-by val)
-         reverse
-         (take 200)
-         (drop 50)
-         println)))
-
-;; (freq-words "lean.txt")
-;; (freq-words "inc-lean.txt")
-;; (freq-words "hbs-lean.txt")
-;; (freq-words "fifty-shades.txt")
-
 (defn word-transitions [sample]
   "Transform text into trigrams"
   (let [words (clojure.string/split sample #"[\s|\n]")]
-    (partition-all 2 1 words)))
+    (partition-all 3 1 words)))
 
 (defn word-chain [partitions]
   (reduce (fn [r t] (merge-with clojure.set/union r
-                                 (let [[a b] t]
-                                   {[a] (if b #{b} #{})})))
+                                 (let [[a b c] t]
+                                   {[a b] (if c #{c} #{})})))
            {}
            partitions))
 
@@ -59,7 +42,7 @@
 
 (defn walk-chain [chain result]
   "Build a chain until the text version would hit 140 characters"
-  (let [prefix (vector (last result))
+  (let [prefix (take-last 2 result)
         suffixes (get chain prefix)]
     (if (empty? suffixes)
       result
@@ -126,3 +109,21 @@
     (if valid?
       phrase
       (recur))))
+
+
+;; frequency counting of source texts
+(defn freq-words [filename]
+  "Returns frequent words that aren't the *most* frequent"
+  (let [file-text (-> filename clojure.java.io/resource slurp)
+        freqs (frequencies (clojure.string/split file-text #"\s"))]
+    (->> freqs
+         (sort-by val)
+         reverse
+         (take 200)
+         (drop 50)
+         println)))
+
+;; (freq-words "lean.txt")
+;; (freq-words "inc-lean.txt")
+;; (freq-words "hbs-lean.txt")
+;; (freq-words "fifty-shades.txt")
