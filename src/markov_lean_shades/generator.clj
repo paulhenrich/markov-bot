@@ -96,11 +96,12 @@
   (merge lean-corpus shades-corpus))
 
 (def branching-prefixes
-  "Find potential starting point for the generator"
+  "All potential starting points for the generator"
   (keys (filter (fn [[prefix suffixes]]
-                  (and (re-find #"^[A-Z][a-z]+[^\.,!\(\)]$" (first prefix))
-                       (re-find #"^[a-z0-9]+[^\.,!\(\)]$" (second prefix)))) ; avoid starting with the end
-                lean-corpus)))
+                  (and (not (empty? suffixes))
+                       (re-find #"^[A-Z][a-z]+[^\.,!\(\)]$" (first prefix))  ; avoid starting
+                       (re-find #"^[a-z0-9]+[^\.,!\(\)]$" (second prefix)))) ; with punctuation
+                corpus)))
 
 (defn score [phrase targets]
   "Scores phrases by coincidence with words in targets (set)"
