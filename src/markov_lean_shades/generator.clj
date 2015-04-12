@@ -40,12 +40,12 @@
 (defn word-transitions [sample]
   "Transform text into trigrams"
   (let [words (clojure.string/split sample #"[\s|\n]")]
-    (partition-all 3 1 words)))
+    (partition-all 2 1 words)))
 
 (defn word-chain [partitions]
   (reduce (fn [r t] (merge-with clojure.set/union r
-                                 (let [[a b c] t]
-                                   {[a b] (if c #{c} #{})})))
+                                 (let [[a b] t]
+                                   {[a] (if b #{b} #{})})))
            {}
            partitions))
 
@@ -57,24 +57,26 @@
 (defn chain->text [[first-word & remaining]]
   (apply str first-word " " (interpose " " remaining)))
 
-(defn walk-chain [prefix chain result]
+(defn walk-chain [chain result]
   "Build a chain until the text version would hit 140 characters"
-  (let [suffixes (get chain prefix)]
+  (let [prefix (vector (last result))
+        suffixes (get chain prefix)]
     (if (empty? suffixes)
       result
       (let [suffix (first (shuffle suffixes))
-            new-prefix [(last prefix) suffix]
+            new-prefix [prefix suffix]
             result-with-spaces (chain->text result)
             result-char-count (count result-with-spaces)
             suffix-char-count (inc (count suffix))
             new-result-char-count (+ result-char-count suffix-char-count)]
         (if (> new-result-char-count 140)
           result
-          (recur new-prefix chain (conj result suffix)))))))
+          (recur chain (conj result suffix)))))))
+
 
 (defn generate-text [prefix chain]
-  (let [prefix (clojure.string/split prefix #" ")
-        result-chain (walk-chain prefix chain prefix)
+  (let [;prefix (clojure.string/split prefix #" ")
+        result-chain (walk-chain chain prefix)
         result-text (chain->text result-chain)]
     result-text))
 
@@ -100,7 +102,8 @@
   (keys (filter (fn [[prefix suffixes]]
                   (and (not (empty? suffixes))
                        (re-find #"^[A-Z][a-z]+[^\.,!\(\)]$" (first prefix))  ; avoid starting
-                       (re-find #"^[a-z0-9]+[^\.,!\(\)]$" (second prefix)))) ; with punctuation
+                       ;(re-find #"^[a-z0-9]+[^\.,!\(\)]$" (second prefix))
+                       )) ; with punctuation
                 corpus)))
 
 (defn score [phrase targets]
@@ -116,12 +119,13 @@
 
 (defn gen-random []
   "Generate a random 50 Shades of Lean phrase"
-  (let [prefix (-> branching-prefixes rand-nth chain->text)
+  (let [prefix (-> branching-prefixes rand-nth)
         phrase (trim-phrase (generate-text prefix corpus))
-        valid? (and (>= (score phrase lean-words) (inc (rand-int  2)))
-                    (>= (score phrase shades-words) (inc (rand-int 2))))]
+        lean-min (+ 1 (rand-int 2)) ; 1-2
+        shades-min (- 4 lean-min)   ; 2-3
+        valid? (and (>= (score phrase lean-words) lean-min)
+                    (>= (score phrase shades-words) shades-min))]
     (if valid?
       phrase
       (recur))))
 
-(gen-random)
