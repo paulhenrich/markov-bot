@@ -119,8 +119,8 @@
   "Generate a random 50 Shades of Lean phrase"
   (let [prefix (-> branching-prefixes rand-nth)
         phrase (trim-phrase (generate-text prefix corpus))
-        lean-min (+ 1 (rand-int 2)) ; 1-2
-        shades-min (- 4 lean-min)   ; 2-3
+        lean-min (+ 1 (rand-int 3)) ; 1-3
+        shades-min (- 4 lean-min)   ; 1-3
         valid? (and (>= (score phrase lean-words) lean-min)
                     (>= (score phrase shades-words) shades-min))]
     (if valid?
