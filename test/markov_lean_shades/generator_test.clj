@@ -38,19 +38,19 @@
     (testing "dead end"
       (let [prefix ["the" "Pobble"]]
         (is (= ["the" "Pobble" "who"]
-               (walk-chain prefix chain prefix)))))
+               (walk-chain chain prefix)))))
     (testing "multiple options"
       (with-redefs [shuffle identity]
         (let [prefix ["And" "the"]]
           (is (= ["And" "the" "Pobble" "who"]
-                 (walk-chain prefix chain prefix))))))
+                 (walk-chain chain prefix))))))
     (testing "repeating chains"
       (with-redefs [shuffle reverse]
         (let [prefix ["And" "the"]]
           (is (> 140
-                 (count (apply str (walk-chain prefix chain prefix)))))
+                 (count (apply str (walk-chain chain prefix)))))
           (is (= ["And" "the" "Golden" "Grouse" "And" "the" "Golden" "Grouse"]
-                 (take 8 (walk-chain prefix chain prefix)))))))))
+                 (take 8 (walk-chain chain prefix)))))))))
 
 (deftest test-generate-text
   "it strings together and capitalizes the text"
@@ -62,14 +62,13 @@
                  ["Golden" "Grouse"] #{"And"}
                  ["the" "Golden"] #{"Grouse"}
                  ["And" "the"] #{"Pobble" "Golden"}}]
-      (is (= "the Pobble who" (generate-text "the Pobble" chain)))
-      (is (= "And the Pobble who" (generate-text "And the" chain))))))
+      (is (= "The Pobble who" (generate-text ["the" "Pobble"] chain)))
+      (is (= "And the Pobble who" (generate-text ["And" "the"] chain))))))
 
-(deftest test-trim-phrase
-  "cuts off run-on phrases at the last punctuation, <- for instance right there"
-  (is (= "We test. Iteratively." (trim-phrase "We test. Iteratively. Then")))
-  (is (= "We test, iteratively." (trim-phrase "We test, iteratively, then")))
-  )
+(deftest test-finalize-phrase
+  "Cuts off run-on phrases at the last punctuation, <- for instance right there"
+  (is (= "We test. Iteratively." (finalize-phrase "We test. Iteratively. Then")))
+  (is (= "We test, iteratively." (finalize-phrase "We test, iteratively, then"))))
 
 (deftest test-score
   "scores the entire phrase for target words"

@@ -37,8 +37,8 @@
       word-transitions
       word-chain))
 
-(defn chain->text [[first-word & remaining]]
-  (apply str first-word " " (interpose " " remaining)))
+(defn chain->text [[initial & remaining]]
+  (apply str (clojure.string/capitalize initial) " " (interpose " " remaining)))
 
 (defn walk-chain [chain result]
   "Build a chain until the text version would hit 140 characters"
@@ -84,8 +84,10 @@
   "All potential starting points for the generator"
   (keys (filter (fn [[prefix suffixes]]
                   (and (not (empty? suffixes))
-                       (re-find #"^[A-Z][a-z]+[^\.,!\(\)]$" (first prefix)))) ; capitalized words not ending a sentence
-                corpus)))
+                       (re-find #"^[A-Za-z]+[^\.,!\(\)]$" (first prefix))
+                       (re-find #"^[A-Za-z]+[^\.,!\(\)]$" (second prefix))
+                       )) ; words not ending a sentence
+                lean-corpus)))
 
 (defn score [phrase targets]
   "Scores phrases by coincidence with words in targets (set)"
@@ -95,13 +97,14 @@
                                        (clojure.string/split #"\s")
                                        set))))
 
-(defn trim-phrase [phrase]
-  (clojure.string/replace phrase #"[.,][^\.,]*$" "."))
+(defn finalize-phrase [phrase]
+  (-> phrase
+      (clojure.string/replace #"[.,][^\.,]*$" ".")))
 
 (defn gen-random []
   "Generate a random 50 Shades of Lean phrase"
   (let [prefix (-> branching-prefixes rand-nth)
-        phrase (trim-phrase (generate-text prefix corpus))
+        phrase (finalize-phrase (generate-text prefix corpus))
         lean-min (+ 1 (rand-int 3)) ; 1-3
         shades-min (- 4 lean-min)   ; 1-3
         valid? (and (>= (score phrase lean-words) lean-min)
@@ -109,7 +112,7 @@
     (if valid?
       phrase
       (recur))))
-
+(gen-random)
 
 ;; frequency counting of source texts
 (defn freq-words [filename]
